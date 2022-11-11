@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Loja_DataAccess
 {
-    internal class Categoria
+    public class Categoria
     {
         [Key]
         public int Id { get; set; }
