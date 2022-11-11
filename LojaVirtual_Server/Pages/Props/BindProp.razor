@@ -1,7 +1,44 @@
 ﻿@page "/Props/bindProp"
 
-<h3>BindProp</h3>
+<div class="row">
+    <div class="col-6 border p-3">
+        <h3 class="text-primary">Produto</h3><hr />
+        <div>
+            Ativo: <input type="checkbox" @bind-value="Produto.IsActive" checked="@(Produto.IsActive?"checked":null)" /><br />
+        </div>
+        <div>
+            Preço: <input type="number" @bind-value="@Produto.Price" @bind-value:event="oninput" /><br />
+        </div>
+        <div>
+            Produto Properties:
+            <select @bind="selectedProp">
+                @foreach (var prop in Produto.ProdutoProperties)
+                {
+                    <option value="@prop.Key">@prop.Key</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="col-6 border p-3">
+        <h3 class="text-primary">Produto</h3><hr />
+    </div>
+</div>
 
 @code {
+    private string selectedProp = "";
 
+
+    LojaVirtual_Models.LojaVirtualModels.Demo_Produto Produto = new()
+        {
+            Id = 1,
+            Name = "Esmalte Risque",
+            Price = 1.99,
+            IsActive = true,
+            ProdutoProperties = new List<LojaVirtual_Models.LojaVirtualModels.Demo_ProdutoProp>()
+            {
+                new LojaVirtual_Models.LojaVirtualModels.Demo_ProdutoProp {Id = 1, Key = "Color", Value = "Black"},
+                new LojaVirtual_Models.LojaVirtualModels.Demo_ProdutoProp {Id = 2, Key = "Flavor", Value = "Rose Jasmine"},
+                new LojaVirtual_Models.LojaVirtualModels.Demo_ProdutoProp {Id = 3, Key = "Size", Value = "20oz"},
+            }
+        };
 }
