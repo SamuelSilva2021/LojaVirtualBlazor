@@ -1,9 +1,14 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Loja_DataAccess\Loja_DataAccess.csproj" />
+    <ProjectReference Include="..\Loja_Models\Loja_Models.csproj" />
+  </ItemGroup>
 
 </Project>
