@@ -1,14 +1,21 @@
 ﻿@page "/categoria/create"
 
+@inject ICategoriaRepository _categoriaRepository
+@inject NavigationManager _navigationManager
+
 <div class="row my-2">
     <h3 class="card-title text-primary mb-3 ml-3">@Title</h3>
 
     <div class="col-6">
-        <EditForm Model="Categoria">
+        <EditForm Model="Categoria" OnValidSubmit="CategoriaTeste">
+            @*Pega o data anotation da classe, nesse acaso o CategoriaDTO*@
+            <DataAnnotationsValidator/>
+            @*<ValidationSummary/>*@
             <div class="form-group">
                 <label>Nome</label>
                 <InputText @bind-Value="Categoria.Nome" class="form-control"></InputText>
             </div>
+            <ValidationMessage For="() => Categoria.Nome"/>
             <div class="form-group p-2">
                 <button class="btn btn-primary">Criar</button>
                 <NavLink href="categoria" class="btn btn-secondary">Voltar</NavLink>
@@ -20,4 +27,10 @@
 @code {
     private CategoriaDTO Categoria { get; set; } = new CategoriaDTO();
     private string Title { get; set; } = "Adicionar Categoria";
+
+    private void CategoriaTeste()
+    {
+        _categoriaRepository.Create(Categoria);
+        _navigationManager.NavigateTo("/categoria");
+    }
 }
