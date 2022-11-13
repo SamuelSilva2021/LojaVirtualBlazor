@@ -1,0 +1,23 @@
+﻿@page "/categoria/create"
+
+<div class="row my-2">
+    <h3 class="card-title text-primary mb-3 ml-3">@Title</h3>
+
+    <div class="col-6">
+        <EditForm Model="Categoria">
+            <div class="form-group">
+                <label>Nome</label>
+                <InputText @bind-Value="Categoria.Nome" class="form-control"></InputText>
+            </div>
+            <div class="form-group p-2">
+                <button class="btn btn-primary">Criar</button>
+                <NavLink href="categoria" class="btn btn-secondary">Voltar</NavLink>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private CategoriaDTO Categoria { get; set; } = new CategoriaDTO();
+    private string Title { get; set; } = "Adicionar Categoria";
+}

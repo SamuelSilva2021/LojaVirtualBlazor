@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Loja_Common", "Loja_Common\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Loja_DataAccess", "Loja_DataAccess\Loja_DataAccess.csproj", "{BCB7597F-9A5A-466B-BBF6-00F6864B3BA7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Loja_Models", "Loja_Models\Loja_Models.csproj", "{A87826E0-BEDF-420E-9FA1-1B3472B1B4D7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Loja_Models", "Loja_Models\Loja_Models.csproj", "{A87826E0-BEDF-420E-9FA1-1B3472B1B4D7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
