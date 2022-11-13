@@ -1,4 +1,5 @@
 ﻿@page "/categoria"
+
 @inject ICategoriaRepository _categoriaRepository
 
 <div class="row mt-4">
@@ -26,7 +27,7 @@
                                 @categoria.Nome
                             </td>
                             <td>
-                                <NavLink href="" class="btn btn-primary">Editar</NavLink>
+                                <NavLink href="@($"categoria/edit/{categoria.Id}")" class="btn btn-primary">Editar</NavLink>
                             </td>
 
                         </tr>

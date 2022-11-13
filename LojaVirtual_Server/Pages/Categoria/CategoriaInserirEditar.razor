@@ -1,0 +1,79 @@
+﻿@page "/categoria/create"
+@page "/categoria/edit/{id:int}"
+
+@inject ICategoriaRepository _categoriaRepository
+@inject NavigationManager _navigationManager
+
+<div class="row my-2">
+    <h3 class="card-title text-primary mb-3 ml-3">@TitleWindow</h3>
+
+    <div class="col-6">
+        @if (IsLoading)
+        {
+            <div class="text-center">
+                <img src="/images/loading.gif">
+            </div>
+        }
+        else
+        {
+                <EditForm Model="Categoria" OnValidSubmit="InsertEditCategoria">
+            @*Pega o data anotation da classe, nesse acaso o CategoriaDTO*@
+            <DataAnnotationsValidator/>
+            @*<ValidationSummary/>*@
+            <div class="form-group">
+                <label>Nome</label>
+                <InputText @bind-Value="Categoria.Nome" class="form-control"></InputText>
+            </div>
+            <ValidationMessage For="() => Categoria.Nome"/>
+            <div class="form-group p-2">
+                <button class="@classButton"><span class="oi oi-pencil" aria-hidden="true"></span> @TitleButton</button>
+                <NavLink href="categoria" class="btn btn-secondary">Voltar</NavLink>
+            </div>
+        </EditForm>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private CategoriaDTO Categoria { get; set; } = new CategoriaDTO();
+    private string TitleWindow { get; set; } = "Adicionar Categoria";
+    private string TitleButton { get; set; } = "Adicionar";
+    private string classButton { get; set; } = "btn btn-primary";
+
+    private bool IsLoading { get; set; } = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id == 0)
+        {
+            //Create
+            IsLoading = false;
+        }
+        else
+        {
+            //Update
+            TitleButton = "Editar";
+            TitleWindow = "Editar Categoria";
+            classButton = "btn btn-warning";
+
+            await Task.Run(CarregaCategorias);
+        }
+    }
+    private void CarregaCategorias()
+    {
+        Categoria = _categoriaRepository.Get(Id);
+        IsLoading = false;
+    }
+
+    private void InsertEditCategoria()
+    {
+        if (Id == 0)
+            _categoriaRepository.Create(Categoria);
+        else
+            _categoriaRepository.Update(Categoria);
+        _navigationManager.NavigateTo("categoria");
+    }
+}
