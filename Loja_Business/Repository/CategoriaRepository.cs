@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Loja_Business.Repository
 {
-    internal class CategoriaRepository : ICategoriaRepository
+    public class CategoriaRepository : ICategoriaRepository
     {
         private readonly ApplicationDbContext _db;
         private readonly IMapper _mapper;
@@ -37,6 +37,7 @@ namespace Loja_Business.Repository
             var obj = _mapper.Map<CategoriaDTO, Categoria>(objDTO);
 
             var addedObj = _db.Categorias.Add(obj);
+            obj.DataCriacao = DateTime.Now;
             _db.SaveChanges();
 
             return _mapper.Map<Categoria, CategoriaDTO>(addedObj.Entity);
@@ -44,22 +45,41 @@ namespace Loja_Business.Repository
 
         public int Delete(int id)
         {
-            throw new NotImplementedException();
+            var obj = _db.Categorias.FirstOrDefault(x => x.Id== id);
+            if (obj != null) 
+            {
+                _db.Categorias.Remove(obj);
+                return _db.SaveChanges();
+            }
+            return 0;
         }
 
         public CategoriaDTO Get(int id)
         {
-            throw new NotImplementedException();
+            var obj = _db.Categorias.FirstOrDefault(x => x.Id == id);
+            if(obj != null)
+            {
+                return _mapper.Map<Categoria,CategoriaDTO>(obj);
+            }
+            return new CategoriaDTO();
         }
 
         public IEnumerable<CategoriaDTO> GetAll()
         {
-            throw new NotImplementedException();
+            return _mapper.Map<IEnumerable<Categoria>, IEnumerable<CategoriaDTO>>(_db.Categorias);
         }
 
         public CategoriaDTO Update(CategoriaDTO objDTO)
         {
-            throw new NotImplementedException();
+            var objFromDb = _db.Categorias.FirstOrDefault(x => x.Id ==objDTO.Id);
+            if (objFromDb != null)
+            {
+                objFromDb.Nome= objDTO.Nome;
+                _db.Update(objFromDb);
+                _db.SaveChanges();
+                return _mapper.Map<Categoria, CategoriaDTO>(objFromDb);
+            }
+            return objDTO;
         }
     }
 }

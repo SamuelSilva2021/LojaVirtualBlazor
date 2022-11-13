@@ -1,3 +1,5 @@
+using Loja_Business.Repository;
+using Loja_Business.Repository.IRepository;
 using Loja_DataAccess.Data;
 using LojaVirtual_Server.Data;
 using Microsoft.AspNetCore.Components;
@@ -13,6 +15,8 @@ builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
