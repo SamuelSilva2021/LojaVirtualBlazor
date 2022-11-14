@@ -9,10 +9,10 @@ namespace Loja_Business.Repository.IRepository
 {
     public interface ICategoriaRepository
     {
-        public CategoriaDTO Create(CategoriaDTO objDTO);
-        public CategoriaDTO Update(CategoriaDTO objDTO);
-        public int Delete(int id);
-        public CategoriaDTO Get(int id);
-        public IEnumerable<CategoriaDTO> GetAll();
+        public Task<CategoriaDTO> Create(CategoriaDTO objDTO);
+        public Task<CategoriaDTO> Update(CategoriaDTO objDTO);
+        public Task<int> Delete(int id);
+        public Task<CategoriaDTO> Get(int id);
+        public Task<IEnumerable<CategoriaDTO>> GetAll();
     }
 }

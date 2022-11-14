@@ -26,8 +26,8 @@
             </div>
             <ValidationMessage For="() => Categoria.Nome"/>
             <div class="form-group p-2">
-                <button class="@classButton"><span class="oi oi-pencil" aria-hidden="true"></span> @TitleButton</button>
-                <NavLink href="categoria" class="btn btn-secondary">Voltar</NavLink>
+               <button class="@classButton"><span class="@classSpan" aria-hidden="true"></span> @TitleButton</button>
+               <NavLink href="categoria" class="btn btn-outline-secondary"><span class="bi bi-arrow-left-square"></span> Voltar</NavLink>
             </div>
         </EditForm>
         }
@@ -40,10 +40,11 @@
 
     private CategoriaDTO Categoria { get; set; } = new CategoriaDTO();
     private string TitleWindow { get; set; } = "Adicionar Categoria";
-    private string TitleButton { get; set; } = "Adicionar";
+    private string TitleButton { get; set; } = "Inserir";
     private string classButton { get; set; } = "btn btn-primary";
+    private string classSpan { get; set; } = "bi bi-receipt";
 
-    private bool IsLoading { get; set; } = true;
+    private bool IsLoading { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -58,22 +59,26 @@
             TitleButton = "Editar";
             TitleWindow = "Editar Categoria";
             classButton = "btn btn-warning";
+            classSpan = "bi bi-pencil-fill";
 
-            await Task.Run(CarregaCategorias);
+            await CarregaCategorias();
         }
     }
-    private void CarregaCategorias()
+    private async Task CarregaCategorias()
     {
-        Categoria = _categoriaRepository.Get(Id);
+        IsLoading = true;
+        StateHasChanged();
+        Categoria = await _categoriaRepository.Get(Id);
         IsLoading = false;
+        StateHasChanged();
     }
 
-    private void InsertEditCategoria()
+    private async Task InsertEditCategoria()
     {
         if (Id == 0)
-            _categoriaRepository.Create(Categoria);
+           await _categoriaRepository.Create(Categoria);
         else
-            _categoriaRepository.Update(Categoria);
+           await _categoriaRepository.Update(Categoria);
         _navigationManager.NavigateTo("categoria");
     }
 }
