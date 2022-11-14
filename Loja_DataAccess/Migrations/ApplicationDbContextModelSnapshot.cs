@@ -41,6 +41,61 @@ namespace LojaDataAccess.Migrations
 
                     b.ToTable("Categorias");
                 });
+
+            modelBuilder.Entity("Loja_DataAccess.Produto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CategoriaId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DataCriacao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Descricao")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("FavoritosCliente")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("FavoritosShop")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("Produtos");
+                });
+
+            modelBuilder.Entity("Loja_DataAccess.Produto", b =>
+                {
+                    b.HasOne("Loja_DataAccess.Categoria", "Categoria")
+                        .WithMany()
+                        .HasForeignKey("CategoryId");
+
+                    b.Navigation("Categoria");
+                });
 #pragma warning restore 612, 618
         }
     }

@@ -1,0 +1,106 @@
+﻿@page "/produto"
+@inject IProdutoRepository _produtoRepository
+@inject IJSRuntime _jsRuntime
+
+<_DeleteConfirmation IsParentComponentProcessing="IsLoading" ConfirmationChanged="ConfirmaDelete" Text="@textModal" Nome="@NomeProduto"></_DeleteConfirmation>
+
+<div class="row mt-4">
+    <div class="col-6">
+        <h4 class="card-title text-primary">Lista de Produtos</h4>
+    </div>
+    <div class="col-4 offset-2">
+        <a href="produto/create" class="btn btn-primary form-control">Adicionar</a>
+    </div>
+        <div class="col-12 p-3">
+        @if (Produtos.Any())
+        {
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Favoritos Loja</th>
+                            <th>Favoritos Clientes</th>
+                            <th>Categoria</th>
+                            <th class="col-3">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var produto in Produtos)
+                    {
+                                <tr>
+                                    <td>
+                                        @produto.Nome
+                                    </td>
+                                    <td>
+                                       <input type="checkbox" disabled checked="@produto.FavoritosShop">
+                                    </td>
+                                    <td>
+                                        <input type="checkbox" disabled checked="@produto.FavoritosCliente">
+                                    </td>
+                                    <td>
+                                        @produto.Categoria.Nome
+                                    </td>
+                                    <td>
+                                        <NavLink href="@($"produto/edit/{produto.Id}")" class="btn btn-warning"><span class="oi oi-pencil" aria-hidden="true"></span> Editar</NavLink>
+                                        <NavLink @onclick="()=>HandleDelete(produto.Id, produto.Nome)" class="btn btn-danger"><span class="ep:delete" aria-hidden="true"></span> Excluir</NavLink>
+                                    </td>
+                                </tr>
+                    }
+                    </tbody>
+                </table>
+        }
+        else
+        {
+            if (IsLoading)
+            {
+                        <div class="text-center">
+                            <img src="/images/loading.gif">
+                        </div>
+            }
+            else
+            {
+                        <p>Nenhum registro foi encontrado</p>
+            }
+        }
+    </div>
+ </div>
+@code {
+    [Parameter]
+    public EventCallback<bool> ConfirmationChanged { get; set; }
+
+    private IEnumerable<ProdutoDTO> Produtos { get; set; } = new List<ProdutoDTO>();
+    private bool IsLoading { get; set; }
+    public int DeleteProdutoId { get; set; } = 0;
+    public string NomeProduto { get; set; }
+    public string textModal = "Tem certeza que deseja o produto: ";
+
+
+    private async Task ListarProdutos()
+    {
+        IsLoading = true;
+        StateHasChanged();
+        Produtos = await _produtoRepository.GetAll();
+        IsLoading = false;
+        StateHasChanged();
+    }
+    private void HandleDelete(int id, string nome)
+    {
+        DeleteProdutoId = id;
+        NomeProduto = nome;
+        //chama o método JS
+        _jsRuntime.InvokeVoidAsync("MostrarModalConfirmacaoDelete");
+    }
+    public async Task ConfirmaDelete(bool isConfirmed)
+    {
+        IsLoading = true;
+        if (isConfirmed && DeleteProdutoId != 0)
+        {
+            //Delete
+            await _produtoRepository.Delete(DeleteProdutoId);
+            await ListarProdutos();
+            await _jsRuntime.InvokeVoidAsync("OcultarModalConfirmacaoDelete");
+        }
+        IsLoading = false;
+    }
+
+}

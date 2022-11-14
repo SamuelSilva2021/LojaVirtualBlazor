@@ -1,0 +1,114 @@
+﻿@page "/produto/create"
+@page "/produto/edit/{id:int}"
+
+@inject ICategoriaRepository _categoriaRepository
+@inject IProdutoRepository _produtoRepository
+@inject NavigationManager _navigationManager
+
+<div class="row">
+    <h3 class="card-title text-primary mb-3 ml-3">@TitleWindow</h3>
+
+    <div class="col-12" style="width:50%; min-width:450px; justify-content:center; align-items:center">
+        @if (IsLoading)
+        {
+                <div class="text-center">
+                    <img src="/images/loading.gif">
+                </div>
+        }
+        else
+        {
+            <EditForm Model="Produto" OnValidSubmit="InsertEditProduto">
+                <DataAnnotationsValidator/>
+                <div class="form-group">
+                    <label>Nome</label>
+                    <InputText @bind-Value="Produto.Nome" class="form-control"></InputText>
+                    <ValidationMessage For="() => Produto.Nome"/>
+                </div>
+                <div class="form-group">
+                    <label>Cor</label>
+                    <InputText @bind-Value="Produto.Color" class="form-control"></InputText>
+                    <ValidationMessage For="() => Produto.Color"/>
+                </div>
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <InputTextArea @bind-Value="Produto.Descricao" class="form-control"></InputTextArea>
+                    <ValidationMessage For="() => Produto.Descricao"/>
+                </div>
+                <div class="row pt-3">
+                    <div class="form-group col-3">
+                        <div class="form-check">
+                            <InputCheckbox @bind-Value="Produto.FavoritosShop" class="form-check-input"></InputCheckbox>
+                            <label class="form-check-label">Favoritos Loja</label>
+                        </div>
+                    </div>
+                    <div class="form-group col-3">
+                        <div class="form-check">
+                            <InputCheckbox @bind-Value="Produto.FavoritosCliente" class="form-check-input"></InputCheckbox>
+                            <label class="form-check-label">Favoritos Cliente</label>
+                        </div>
+                    </div>
+                    <div class="form-group col-6">
+                        <label>Categoria</label>
+                        <InputSelect @bind-Value="Produto.CategoriaId" class="form-select">
+                            <option value="0" disabled="disabled" selected>--Selecione uma Categoria--</option>
+                            @foreach (var cat in Categorias)
+                        {
+                            <option value="@cat.Id">@cat.Nome</option>
+                        }
+                        </InputSelect>
+                        <ValidationMessage For="() => Produto.CategoriaId"/>
+                    </div>
+                </div>
+                <div class="form-group p-2">
+                   <button class="@classButton"><span class="@classSpan" aria-hidden="true"></span> @TitleButton</button>
+                   <NavLink href="produto" class="btn btn-outline-secondary"><span class="bi bi-arrow-left-square"></span> Voltar</NavLink>
+                </div>
+            </EditForm>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private ProdutoDTO Produto { get; set; } = new();
+    private IEnumerable<CategoriaDTO> Categorias { get; set; } = new List<CategoriaDTO>();
+
+    private string TitleWindow { get; set; } = "Adicionar Produto";
+    private string TitleButton { get; set; } = "Inserir";
+    private string classButton { get; set; } = "btn btn-primary";
+    private string classSpan { get; set; } = "bi bi-receipt";
+    private bool IsLoading { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await ListarProdutos();
+        }
+    }
+    private async Task ListarProdutos()
+    {
+        IsLoading = true;
+        StateHasChanged();
+        Categorias = await _categoriaRepository.GetAll();
+        if(Id != 0)
+        {
+            //update
+            TitleWindow = "Editar Produto";
+            Produto = await _produtoRepository.Get(Id);
+        }
+        IsLoading = false;
+        StateHasChanged();
+    }
+
+    private async Task InsertEditProduto()
+    {
+        if (Produto.Id == 0)
+            await _produtoRepository.Create(Produto);
+        else
+            await _produtoRepository.Update(Produto);
+        _navigationManager.NavigateTo("produto");
+    }
+}
