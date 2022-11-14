@@ -2,6 +2,8 @@ using Loja_Business.Repository;
 using Loja_Business.Repository.IRepository;
 using Loja_DataAccess.Data;
 using LojaVirtual_Server.Data;
+using LojaVirtual_Server.Service;
+using LojaVirtual_Server.Service.IService;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +19,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
+builder.Services.AddScoped<IFileUpLoad, FileUpLoad>();
 
 
 var app = builder.Build();

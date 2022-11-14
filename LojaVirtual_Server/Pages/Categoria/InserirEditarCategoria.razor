@@ -7,32 +7,37 @@
 <div class="row my-2">
     <h3 class="card-title text-primary mb-3 ml-3">@TitleWindow</h3>
 
-    <div class="col-6">
+
+
         @if (IsLoading)
         {
-            <div class="text-center">
-                <img src="/images/loading.gif">
+            <div class="d-flex justify-content-center">
+                <div class="text-center">
+                    <img src="/images/loading.gif">
+                </div>
             </div>
         }
         else
         {
+            <div class="col-6">
                 <EditForm Model="Categoria" OnValidSubmit="InsertEditCategoria">
-            @*Pega o data anotation da classe, nesse acaso o CategoriaDTO*@
-            <DataAnnotationsValidator/>
-            @*<ValidationSummary/>*@
-            <div class="form-group">
-                <label>Nome</label>
-                <InputText @bind-Value="Categoria.Nome" class="form-control"></InputText>
+                @*Pega o data anotation da classe, nesse acaso o CategoriaDTO*@
+                <DataAnnotationsValidator/>
+                @*<ValidationSummary/>*@
+                <div class="form-group">
+                    <label>Nome</label>
+                    <InputText @bind-Value="Categoria.Nome" class="form-control"></InputText>
+                </div>
+                <ValidationMessage For="() => Categoria.Nome"/>
+                <div class="form-group p-2">
+                    <button class="@classButton"><span class="@classSpan" aria-hidden="true"></span> @TitleButton</button>
+                    <NavLink href="categoria" class="btn btn-outline-secondary"><span class="bi bi-arrow-left-square"></span> Voltar</NavLink>
+                </div>
+                </EditForm>
             </div>
-            <ValidationMessage For="() => Categoria.Nome"/>
-            <div class="form-group p-2">
-               <button class="@classButton"><span class="@classSpan" aria-hidden="true"></span> @TitleButton</button>
-               <NavLink href="categoria" class="btn btn-outline-secondary"><span class="bi bi-arrow-left-square"></span> Voltar</NavLink>
-            </div>
-        </EditForm>
         }
-    </div>
 </div>
+
 
 @code {
     [Parameter]
