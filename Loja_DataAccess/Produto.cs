@@ -16,11 +16,12 @@ namespace Loja_DataAccess
         public string Descricao { get; set;}
         public bool FavoritosShop { get; set;}
         public bool FavoritosCliente { get; set; }
-        public string Color { get; set; }
-        public string ImageUrl { get; set; }
+        public string? Color { get; set; }
+        public string? ImageUrl { get; set; }
         public int CategoriaId { get; set; }
-        [ForeignKey("CategoryId")]
+        [ForeignKey("CategoriaId")]
         public Categoria Categoria { get; set;}
+        public string? Observacao { get; set; }
         public DateTime DataCriacao { get; set; }
     }
 }

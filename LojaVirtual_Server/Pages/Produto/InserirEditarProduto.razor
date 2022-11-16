@@ -4,11 +4,13 @@
 @inject ICategoriaRepository _categoriaRepository
 @inject IProdutoRepository _produtoRepository
 @inject NavigationManager _navigationManager
+@inject IFileUpLoad _fileUpload
+@inject IJSRuntime _jsRuntime
 
-<div class="row">
+<div class="row my-2">
     <h3 class="card-title text-primary mb-3 ml-3">@TitleWindow</h3>
-
     
+    <div class="col-md-10">
         @if (IsLoading)
         {
             <div class="d-flex justify-content-center">
@@ -19,56 +21,62 @@
         }
         else
         {
-            <div class="col-12" style="width:50%; min-width:450px; justify-content:center; align-items:center">
-                <EditForm Model="Produto" OnValidSubmit="InsertEditProduto">
-                    <DataAnnotationsValidator/>
-                    <div class="form-group">
-                        <label>Nome</label>
-                        <InputText @bind-Value="Produto.Nome" class="form-control"></InputText>
-                        <ValidationMessage For="() => Produto.Nome"/>
-                    </div>
-                    <div class="form-group">
-                        <label>Cor</label>
-                        <InputText @bind-Value="Produto.Color" class="form-control"></InputText>
-                        <ValidationMessage For="() => Produto.Color"/>
-                    </div>
-                    <div class="form-group">
-                        <label>Descrição</label>
-                        <InputTextArea @bind-Value="Produto.Descricao" class="form-control"></InputTextArea>
-                        <ValidationMessage For="() => Produto.Descricao"/>
-                    </div>
-                    <div class="row pt-3">
-                        <div class="form-group col-3">
-                            <div class="form-check">
-                                <InputCheckbox @bind-Value="Produto.FavoritosShop" class="form-check-input"></InputCheckbox>
-                                <label class="form-check-label">Favoritos Loja</label>
-                            </div>
+            <EditForm Model="Produto" OnValidSubmit="InsertEditProduto">
+                <DataAnnotationsValidator/>
+                <div class="form-group">
+                    <label>Nome</label>
+                    <InputText @bind-Value="Produto.Nome" class="form-control"></InputText>
+                    <ValidationMessage For="() => Produto.Nome"/>
+                </div>
+                <div class="form-group">
+                    <label>Cor</label>
+                    <InputText @bind-Value="Produto.Color" class="form-control"></InputText>
+                    <ValidationMessage For="() => Produto.Color"/>
+                </div>
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <InputTextArea @bind-Value="Produto.Descricao" class="form-control"></InputTextArea>
+                    <ValidationMessage For="() => Produto.Descricao"/>
+                </div>
+                <div class="row pt-3">
+                    <div class="form-group col-3">
+                        <div class="form-check">
+                            <InputCheckbox @bind-Value="Produto.FavoritosShop" class="form-check-input"></InputCheckbox>
+                            <label class="form-check-label">Favoritos Loja</label>
                         </div>
-                        <div class="form-group col-3">
-                            <div class="form-check">
-                                <InputCheckbox @bind-Value="Produto.FavoritosCliente" class="form-check-input"></InputCheckbox>
-                                <label class="form-check-label">Favoritos Cliente</label>
-                            </div>
+                    </div>
+                    <div class="form-group col-3">
+                        <div class="form-check">
+                            <InputCheckbox @bind-Value="Produto.FavoritosCliente" class="form-check-input"></InputCheckbox>
+                            <label class="form-check-label">Favoritos Cliente</label>
                         </div>
-                        <div class="form-group col-6">
-                            <label>Categoria</label>
-                            <InputSelect @bind-Value="Produto.CategoriaId" class="form-select">
-                                <option value="0" disabled="disabled" selected>--Selecione uma Categoria--</option>
-                                @foreach (var cat in Categorias)
-                            {
+                    </div>
+                    <div class="form-group col-6">
+                        <label>Categoria</label>
+                        <InputSelect @bind-Value="Produto.CategoriaId" class="form-select">
+                            <option value="0" disabled="disabled" selected>--Selecione uma Categoria--</option>
+                        @foreach (var cat in Categorias)
+                        {
                                 <option value="@cat.Id">@cat.Nome</option>
-                            }
-                            </InputSelect>
-                            <ValidationMessage For="() => Produto.CategoriaId"/>
-                        </div>
+                        }
+                        </InputSelect>
+                        <ValidationMessage For="() => Produto.CategoriaId"/>
                     </div>
-                    <div class="form-group p-2">
-                       <button class="@classButton"><span class="@classSpan" aria-hidden="true"></span> @TitleButton</button>
-                       <NavLink href="produto" class="btn btn-outline-secondary"><span class="bi bi-arrow-left-square"></span> Voltar</NavLink>
+                    <div class="form-group col-6">
+                        <InputFile OnChange="HandleImageUpload"></InputFile>
                     </div>
-                </EditForm>
-            </div>
+                </div>
+                <div class="form-group p-2">
+                   <button class="@classButton"><span class="@classSpan" aria-hidden="true"></span> @TitleButton</button>
+                   <NavLink href="produto" class="btn btn-outline-secondary"><span class="bi bi-arrow-left-square"></span> Voltar</NavLink>
+                </div>
+            </EditForm>
         }
+    </div>
+    <div class="col-md-2">
+        <img src="@Produto.ImageUrl" class="w-100" />
+    </div>
+
     </div>
 
 
@@ -76,7 +84,10 @@
     [Parameter]
     public int Id { get; set; }
 
-    private ProdutoDTO Produto { get; set; } = new();
+    private ProdutoDTO Produto { get; set; } = new()
+    {
+        ImageUrl = "/images/default.png"    
+    };
     private IEnumerable<CategoriaDTO> Categorias { get; set; } = new List<CategoriaDTO>();
 
     private string TitleWindow { get; set; } = "Adicionar Produto";
@@ -114,5 +125,34 @@
         else
             await _produtoRepository.Update(Produto);
         _navigationManager.NavigateTo("produto");
+    }
+    private async Task HandleImageUpload(InputFileChangeEventArgs e)
+    {
+        IsLoading = true;
+        try
+        {
+            if(e.GetMultipleFiles().Count > 0)
+            {
+                foreach (var arquivo in e.GetMultipleFiles())
+                {
+                    System.IO.FileInfo arquivoInfo = new System.IO.FileInfo(arquivo.Name);
+                    if(arquivoInfo.Extension.ToLower() == ".jpg"||
+                        arquivoInfo.Extension.ToLower() == ".png"||
+                        arquivoInfo.Extension.ToLower() == ".jpeg")
+                    {
+                        Produto.ImageUrl = await _fileUpload.UploadFiles(arquivo);
+                    }
+                    else
+                    {
+                        await _jsRuntime.ToastrError("Permitido apenas arquivos com extensão .jpg/.jpeg/.png");
+                    }
+                }
+            }
+            IsLoading = false;
+        }
+        catch (Exception ex)
+        {
+            await _jsRuntime.ToastrError(ex.Message);
+        }
     }
 }

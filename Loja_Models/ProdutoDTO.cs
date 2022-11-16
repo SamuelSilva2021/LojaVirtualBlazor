@@ -23,5 +23,6 @@ namespace Loja_Models
         [Range(1,int.MaxValue, ErrorMessage ="Por favor, selecione uma categoria")]
         public int CategoriaId { get; set; }
         public CategoriaDTO Categoria { get; set; }
+        public string Observacao { get; set; }
     }
 }

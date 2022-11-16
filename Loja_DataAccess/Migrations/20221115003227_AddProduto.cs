@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LojaDataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class AddProdutoToDB : Migration
+    public partial class AddProduto : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -21,26 +21,26 @@ namespace LojaDataAccess.Migrations
                     Descricao = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FavoritosShop = table.Column<bool>(type: "bit", nullable: false),
                     FavoritosCliente = table.Column<bool>(type: "bit", nullable: false),
-                    Color = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Color = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CategoriaId = table.Column<int>(type: "int", nullable: false),
-                    CategoryId = table.Column<int>(type: "int", nullable: true),
                     DataCriacao = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Produtos", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Produtos_Categorias_CategoryId",
-                        column: x => x.CategoryId,
+                        name: "FK_Produtos_Categorias_CategoriaId",
+                        column: x => x.CategoriaId,
                         principalTable: "Categorias",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Produtos_CategoryId",
+                name: "IX_Produtos_CategoriaId",
                 table: "Produtos",
-                column: "CategoryId");
+                column: "CategoriaId");
         }
 
         /// <inheritdoc />
