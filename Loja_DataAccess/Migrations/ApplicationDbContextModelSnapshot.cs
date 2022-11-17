@@ -53,8 +53,11 @@ namespace LojaDataAccess.Migrations
                     b.Property<int>("CategoriaId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Color")
+                    b.Property<string>("Cor")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DataAlteracao")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("DataCriacao")
                         .HasColumnType("datetime2");
@@ -62,12 +65,6 @@ namespace LojaDataAccess.Migrations
                     b.Property<string>("Descricao")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("FavoritosCliente")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("FavoritosShop")
-                        .HasColumnType("bit");
 
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
@@ -78,6 +75,12 @@ namespace LojaDataAccess.Migrations
 
                     b.Property<string>("Observacao")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("PrecoVenda")
+                        .HasColumnType("float");
+
+                    b.Property<double>("ValorCompra")
+                        .HasColumnType("float");
 
                     b.HasKey("Id");
 

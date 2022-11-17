@@ -63,9 +63,12 @@ namespace Loja_Business.Repository
                 objFromDb.Descricao= objDTO.Descricao;
                 objFromDb.ImageUrl = objDTO.ImageUrl;
                 objFromDb.CategoriaId= objDTO.CategoriaId;
-                objFromDb.Color= objDTO.Color;
-                objFromDb.FavoritosShop= objDTO.FavoritosShop;
-                objFromDb.FavoritosCliente= objDTO.FavoritosCliente;
+                objFromDb.Cor = objDTO.Cor;
+                objFromDb.Observacao= objDTO.Observacao;
+                objFromDb.DataCriacao= objDTO.DataCriacao;
+                objFromDb.DataAlteracao= objDTO.DataAlteracao;
+                objFromDb.ValorCompra = objDTO.ValorCompra;
+                objFromDb.PrecoVenda= objDTO.PrecoVenda;
 
                 _db.Produtos.Update(objFromDb);
                 await _db.SaveChangesAsync();

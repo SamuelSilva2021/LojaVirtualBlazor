@@ -16,7 +16,6 @@ namespace Loja_Business.Mapper
             //Reverse map já faz com que seja feito o mapeamento reverso
             CreateMap<Categoria, CategoriaDTO>().ReverseMap();
             CreateMap<Produto, ProdutoDTO>().ReverseMap();
-            //CreateMap<CategoriaDTO, Categoria>();
         }
     }
 }

@@ -1,0 +1,101 @@
+﻿@page "/datagrid"
+
+@inject IProdutoRepository _produtoRepository
+@inject ICategoriaRepository _categoriaRepository
+@inject NavigationManager _navigationManager
+@inject ContextMenuService ContextMenuService
+@if (IsLoading)
+{
+                <div class="d-flex justify-content-center">
+                    <div class="text-center">
+                        <img src="/images/loading.gif">
+                    </div>
+                </div>                 
+}else{
+            <RadzenDataGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+    AllowPaging="true" AllowAlternatingRows="false"   PageSize="5" 
+        AllowSorting="true" Data="@produtos" TItem="ProdutoDTO" ColumnWidth="200px"  
+        SelectionMode="DataGridSelectionMode.Single" @bind-Value=@produtoSelecionado CellContextMenu="@OnCellContextMenu">
+            <Columns>
+                <RadzenDataGridColumn TItem="ProdutoDTO" Property="Id" Title="Id" Width="80px" Frozen="true"/>
+                <RadzenDataGridColumn TItem="ProdutoDTO" Property="Nome" Title="Nome" Frozen="true"/>
+                <RadzenDataGridColumn TItem="ProdutoDTO" Property="PrecoVenda" Title="Preço de Venda" Frozen="true"/>
+                <RadzenDataGridColumn TItem="ProdutoDTO" Property="Descricao" Title="Descrição" Frozen="true"/>
+                <RadzenDataGridColumn TItem="ProdutoDTO" Property="Categoria.Nome" Title="Categoria" Frozen="true"/>                
+                <RadzenDataGridColumn TItem="ProdutoDTO" Property="ImageUrl" Title="Imagem" Width="50px" Frozen="true" Filterable="false">
+                    <Template Context="produto">
+                        <RadzenImage Path="@produto.ImageUrl" style="width: 32px; height: 32px; border-radius: 16px; margin-right: 6px;" />
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="ProdutoDTO" Context="produto" Filterable="false" TextAlign="TextAlign.Center" Width="70px" Title="Ações">
+                    <Template Context="produto">
+                        <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(args => EditRow(produto))" @onclick:stopPropagation="true">
+                        </RadzenButton>
+                        <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" Class="my-1 ms-1" Click="@(args => DeleteRow(produto))"  @onclick:stopPropagation="true">
+                        </RadzenButton>
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+
+}
+
+@code {
+    RadzenDataGrid<ProdutoDTO> Grid;
+    IList<ProdutoDTO>? lstprodutos;
+    IList<ProdutoDTO>? produtoSelecionado;
+    IEnumerable<ProdutoDTO>? produtos;
+    private IEnumerable<CategoriaDTO> Categorias { get; set; } = new List<CategoriaDTO>();
+    private bool IsLoading { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        produtos = await _produtoRepository.GetAll();
+        Categorias = await _categoriaRepository.GetAll();
+        lstprodutos = produtos.ToList();
+    }
+
+    async Task EditRow(ProdutoDTO produto)
+    {
+        _navigationManager.NavigateTo($"produto/edit/{produto.Id}");
+        StateHasChanged();
+    }
+
+
+    async Task SaveRow(ProdutoDTO produto)
+    {
+        await Grid.UpdateRow(produto);
+    }
+
+    async void DeleteRow(ProdutoDTO produto)
+    {
+        IsLoading = true;
+        StateHasChanged();
+        if (lstprodutos.Contains(produto))
+        {
+            await _produtoRepository.Delete(produto.Id);
+        }
+        await Grid.Reload();
+        IsLoading = false;
+        StateHasChanged();
+    }
+
+    void OnCellContextMenu(DataGridCellMouseEventArgs<ProdutoDTO> args)
+    {
+        produtoSelecionado = new List<ProdutoDTO>() { args.Data };
+
+        ContextMenuService.Open(args,
+            new List<ContextMenuItem> {
+                new ContextMenuItem(){ Text = "Context menu item 1", Value = 1 },
+                new ContextMenuItem(){ Text = "Context menu item 2", Value = 2 },
+                new ContextMenuItem(){ Text = "Context menu item 3", Value = 3 },
+                },
+            (e) =>
+            {
+                Console.WriteLine($"Menu item with Value={e.Value} clicked. Column: {args.Column.Property}, EmployeeID: {args.Data.Id}");
+            }
+         );
+    }
+}

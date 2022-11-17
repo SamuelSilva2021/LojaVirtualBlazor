@@ -1,5 +1,5 @@
-﻿@page "/produto/create"
-@page "/produto/edit/{id:int}"
+﻿@*@page "/produto/create"
+@page "/produto/edit/{id:int}"*@
 
 @inject ICategoriaRepository _categoriaRepository
 @inject IProdutoRepository _produtoRepository
@@ -30,8 +30,8 @@
                 </div>
                 <div class="form-group">
                     <label>Cor</label>
-                    <InputText @bind-Value="Produto.Color" class="form-control"></InputText>
-                    <ValidationMessage For="() => Produto.Color"/>
+                    <InputText @bind-Value="Produto.Cor" class="form-control"></InputText>
+                    <ValidationMessage For="() => Produto.Cor"/>
                 </div>
                 <div class="form-group">
                     <label>Descrição</label>
@@ -39,18 +39,6 @@
                     <ValidationMessage For="() => Produto.Descricao"/>
                 </div>
                 <div class="row pt-3">
-                    <div class="form-group col-3">
-                        <div class="form-check">
-                            <InputCheckbox @bind-Value="Produto.FavoritosShop" class="form-check-input"></InputCheckbox>
-                            <label class="form-check-label">Favoritos Loja</label>
-                        </div>
-                    </div>
-                    <div class="form-group col-3">
-                        <div class="form-check">
-                            <InputCheckbox @bind-Value="Produto.FavoritosCliente" class="form-check-input"></InputCheckbox>
-                            <label class="form-check-label">Favoritos Cliente</label>
-                        </div>
-                    </div>
                     <div class="form-group col-6">
                         <label>Categoria</label>
                         <InputSelect @bind-Value="Produto.CategoriaId" class="form-select">
@@ -153,6 +141,7 @@
         catch (Exception ex)
         {
             await _jsRuntime.ToastrError(ex.Message);
+            StateHasChanged();
         }
     }
 }

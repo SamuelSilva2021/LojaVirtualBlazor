@@ -1,38 +1,131 @@
-﻿@page "/datagrid"
+﻿@page "/datagrid222"
 
 @inject IProdutoRepository _produtoRepository
+@inject ICategoriaRepository _categoriaRepository
+@inject NavigationManager NavManager
 
 <div>
-@if(produto == null){
-    <p>Loading.....</p>
+    <div class="col-12">
+    <div style="margin-bottom: 10px" class="col-md-6">
+    <RadzenButton Click="@ClearSelection" Text="Apagar seleção" />
+     <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle_outline" Class="mt-2 mb-4" Text="Novo Produto" Click="@NavCreateProduto"/> 
+            @if (selectedProd?.Any() == true)
+            {
+                    <div style="margin-left: 16px">
+                               Id Selecionado: @selectedProd[0].Id ======== Nome Produto: @selectedProd[0].Nome
+                    </div>
+            }
+    </div>
+    </div>
+    
+@if(Produtos == null){
+        if (IsLoading)
+        {
+            <div class="d-flex justify-content-center">
+                <div class="text-center">
+                    <img src="/images/loading.gif">
+                </div>
+            </div>  
+        }
+        else
+        {
+            <p>Nenhum registro foi encontrado</p>
+        }
 }else{
-    <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
-    AllowPaging="true" PageSize="4" AllowSorting="true" Data="@produto" TItem="ProdutoDTO" ColumnWidth="150px">
-    <Columns>
-            @*<RadzenDataGridColumn TItem="ProdutoDTO" Title="Imagem" Frozen="true" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center" >
-                <Template Context="Data">
+            <RadzenDataGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
+                AllowSorting="true" Data="@Produtos" TItem="ProdutoDTO" ColumnWidth="200px"
+                SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedProd>
+            <Columns>
+                <RadzenDataGridColumn TItem="ProdutoDTO" Property="Id" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn TItem="ProdutoDTO" Title="Photo" Frozen="true" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center" >
+                    <Template Context="produto">
                         <RadzenImage Path="@produto.ImageUrl" class="rz-gravatar" />
-                </Template>
-        </RadzenDataGridColumn>*@
-        <RadzenGridColumn TItem="ProdutoDTO" Property="Id" Title="Produto ID"></RadzenGridColumn>
-        <RadzenGridColumn TItem="ProdutoDTO" Property="Nome" Title="Produto Nome"></RadzenGridColumn>
-        <RadzenGridColumn TItem="ProdutoDTO" Property="Descricao" Title="Produto ID"></RadzenGridColumn>
-        <RadzenGridColumn TItem="ProdutoDTO" Property="FavoritosShop" Title="Produto ID"></RadzenGridColumn>
-    </Columns>
-    </RadzenGrid>
-}
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="ProdutoDTO" Property="Nome" Title="Nome" Frozen="true" Width="160px" Filterable="false"/>
+                <RadzenDataGridColumn TItem="ProdutoDTO" Property="Descricao" Title="Descrição" Frozen="true" Width="160px" Filterable="false"/>
+                        <RadzenDataGridColumn TItem="ProdutoDTO" Property="FavoritosShop" Title="Favorito Shop" Frozen="true" Width="160px" Filterable="false"/>
+                        <RadzenDataGridColumn TItem="ProdutoDTO" Property="FavoritosCliente" Title="Favorito Cliente" Frozen="true" Width="160px" Filterable="false"/>
+                    <RadzenDataGridColumn TItem="ProdutoDTO" Property="Color" Title="Cor" Frozen="true" Width="160px" Filterable="false"/>
+                        <RadzenDataGridColumn TItem="ProdutoDTO" Title="Ação" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="80px">
+                    <Template Context="order">
+                            <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(args => EditRow(produto))" @onclick:stopPropagation="true">
+                        </RadzenButton>
+                        <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" Class="my-1 ms-1" Disabled="true">
+                        </RadzenButton>
+                    </Template>
+                    <EditTemplate Context="order">
+                        <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium">
+                        </RadzenButton>
+                        <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Class="my-1 ms-1" >
+                        </RadzenButton>
+                        <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" Class="my-1 ms-1">
+                        </RadzenButton>
+                    </EditTemplate>
+                </RadzenDataGridColumn>
+            </Columns>
+                
+        </RadzenDataGrid>
+    }
 </div>
 
 @code {
-    IEnumerable<ProdutoDTO> produto;
-    private List<string> imagens = new List<string>();
+    RadzenDataGrid<ProdutoDTO> produtosDataGrid;
+    IList<ProdutoDTO> produtos;
+
+    private IEnumerable<ProdutoDTO> Produtos { get; set; } = new List<ProdutoDTO>();
+    private IEnumerable<CategoriaDTO> Categorias { get; set; } = new List<CategoriaDTO>();
+    IList<ProdutoDTO> selectedProd;
+    private bool IsLoading { get; set; }
+    private ProdutoDTO produto { get; set; } = new()
+    {
+        ImageUrl = "/images/default.png"
+    };
+    ProdutoDTO produtoInsert;
+    ProdutoDTO produtoUpdate;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await CarregaImagens();
+        }
+    }
+
+    private async Task ListarProdutos()
+    {
+        StateHasChanged();
+        Produtos = await _produtoRepository.GetAll();
+        Categorias = await _categoriaRepository.GetAll();
+
+    }
+    private async Task CarregaImagens()
+    {
+        foreach (var prod in Produtos)
+        {
+            produto.ImageUrl = prod.ImageUrl;
+        }
+        StateHasChanged();
+    }
+
+    void ClearSelection()
+    {
+        selectedProd = null;
+    }
+    void NavCreateProduto()
+    {
+        NavManager.NavigateTo("produto/create");
+    }
+    async Task EditRow(ProdutoDTO produto)
+    {
+        produtoUpdate = produto;
+        await produtosDataGrid.EditRow(produto);
+    }
 
     protected override async Task OnInitializedAsync()
     {
-        produto = await Task.Run(() => _produtoRepository.GetAll());
+        await base.OnInitializedAsync();
+        selectedProd = Produtos.Take(1).ToList();
+        await ListarProdutos();
     }
-    
-
-
-
 }
