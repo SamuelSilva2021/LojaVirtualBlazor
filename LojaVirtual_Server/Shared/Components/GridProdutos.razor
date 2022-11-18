@@ -1,29 +1,32 @@
-﻿@page "/datagrid"
-
-@inject IProdutoRepository _produtoRepository
+﻿@inject IProdutoRepository _produtoRepository
 @inject ICategoriaRepository _categoriaRepository
 @inject NavigationManager _navigationManager
 @inject ContextMenuService ContextMenuService
 @inject IJSRuntime _jsRuntime
 
-<_DeleteConfirmation IsParentComponentProcessing="IsLoading" ConfirmationChanged="ConfirmaDelete" Text="@textModal" Nome="@NomeProduto"></_DeleteConfirmation>
+<DialogConfirm IsParentComponentProcessing="IsLoading" ConfirmationChanged="ConfirmaDelete" Text="@textModal" Nome="@NomeProduto"></DialogConfirm>
 
 @if (IsLoading)
 {
-                <div class="d-flex justify-content-center">
-                    <div class="text-center">
-                        <img src="/images/loading.gif">
-                    </div>
-                </div>                 
-}else{
-            <RadzenDataGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-    AllowPaging="true" AllowAlternatingRows="false"   PageSize="5" 
-        AllowSorting="true" Data="@produtos" TItem="ProdutoDTO" ColumnWidth="200px"  
-        SelectionMode="DataGridSelectionMode.Single" @bind-Value=@produtoSelecionado CellContextMenu="@OnCellContextMenu">
+    <div class="d-flex justify-content-center">
+        <div class="text-center">
+            <img src="/images/loading.gif">
+        </div>
+    </div>                 
+}
+else
+{
+    <RadzenDataGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+        AllowAlternatingRows="false"   PageSize="5" Data="@produtos" TItem="ProdutoDTO" ColumnWidth="200px"  
+        SelectionMode="DataGridSelectionMode.Single" @bind-Value=@produtoSelecionado>
             <Columns>
                 <RadzenDataGridColumn TItem="ProdutoDTO" Property="Id" Title="Id" Width="80px" Frozen="true"/>
                 <RadzenDataGridColumn TItem="ProdutoDTO" Property="Nome" Title="Nome" Frozen="true"/>
-                <RadzenDataGridColumn TItem="ProdutoDTO" Property="PrecoVenda" Title="Preço de Venda" Frozen="true"/>
+                <RadzenDataGridColumn TItem="ProdutoDTO" Property="PrecoVenda" Title="Preço de Venda" Frozen="true">
+                    <Template Context="produto">
+                        @String.Format(new System.Globalization.CultureInfo("pt-BR"), "{0:C}", produto.PrecoVenda)
+                    </Template>
+                </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="ProdutoDTO" Property="Descricao" Title="Descrição" Frozen="true"/>
                 <RadzenDataGridColumn TItem="ProdutoDTO" Property="Categoria.Nome" Title="Categoria" Frozen="true"/>                
                 <RadzenDataGridColumn TItem="ProdutoDTO" Property="ImageUrl" Title="Imagem" Width="50px" Frozen="true" Filterable="false">
@@ -40,7 +43,7 @@
                     </Template>
                 </RadzenDataGridColumn>
             </Columns>
-        </RadzenDataGrid>
+    </RadzenDataGrid>
 
 }
 
@@ -88,23 +91,6 @@
         await Grid.Reload();
         IsLoading = false;
         StateHasChanged();
-    }
-
-    void OnCellContextMenu(DataGridCellMouseEventArgs<ProdutoDTO> args)
-    {
-        produtoSelecionado = new List<ProdutoDTO>() { args.Data };
-
-        ContextMenuService.Open(args,
-            new List<ContextMenuItem> {
-                new ContextMenuItem(){ Text = "Context menu item 1", Value = 1 },
-                new ContextMenuItem(){ Text = "Context menu item 2", Value = 2 },
-                new ContextMenuItem(){ Text = "Context menu item 3", Value = 3 },
-                },
-            (e) =>
-            {
-                Console.WriteLine($"Menu item with Value={e.Value} clicked. Column: {args.Column.Property}, EmployeeID: {args.Data.Id}");
-            }
-         );
     }
     private void HandleDelete(int id, string nome)
     {

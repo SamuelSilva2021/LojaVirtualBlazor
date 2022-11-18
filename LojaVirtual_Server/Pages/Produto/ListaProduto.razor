@@ -6,18 +6,37 @@
 
 
  <div class="row mt-1">
-     <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-1">
-        Produtos
-    </RadzenText>
-    <RadzenText TextStyle="TextStyle.Body1" Class="my-1">
-        Detalhes dos produtos
-    </RadzenText>
-        <div class="col">
-            <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle_outline" Class="mt-2 mb-4" Text="Add Produto" Style="width:180px" Click="NavFormCadProdutos" />
-        </div>
-     <div>
-         <GridProdutos></GridProdutos>
-     </div>
+     <div class="col-12 p-3">
+        @if (Produtos.Any())
+        {
+                <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-1">
+            Produtos
+        </RadzenText>
+        <RadzenText TextStyle="TextStyle.Body1" Class="my-1">
+            Detalhes dos produtos
+        </RadzenText>
+            <div class="col">
+                <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle_outline" Class="mt-2 mb-4" Text="Add Produto" Style="width:180px" Click="Create" />
+            </div>
+         <div>
+             <GridProdutos></GridProdutos>
+            </div>
+        }
+        else
+        {
+            if (IsLoading)
+            {
+                <div class="text-center">
+                    <img src="/images/loading.gif">
+                </div>
+            }
+            else
+            {
+                <p>Nenhum registro foi encontrado</p>
+            }
+        }
+    </div>
+     
  </div>
 
 @code {
@@ -44,7 +63,7 @@
         StateHasChanged();
     }
     
-    void NavFormCadProdutos()
+    void Create()
     {
         _navigationManager.NavigateTo("produto/create");
     }

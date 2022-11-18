@@ -1,42 +1,28 @@
 ﻿@page "/categoria"
 @inject ICategoriaRepository _categoriaRepository
 @inject IJSRuntime _jsRuntime
+@inject NavigationManager _navigationManager
 
-<_DeleteConfirmation IsParentComponentProcessing="IsLoading" ConfirmationChanged="ConfirmaDelete" Text="@textModal" Nome="@NomeCategoria"></_DeleteConfirmation>
+
+<DialogConfirm IsParentComponentProcessing="IsLoading" ConfirmationChanged="ConfirmaDelete" Text="@textModal" Nome="@NomeCategoria"></DialogConfirm>
 
 <div class="row mt-4">
-    <div class="col-6">
-        <h4 class="card-title text-primary">Lista de Categoria</h4>
-    </div>
-    <div class="col-4 offset-2">
-        <a href="categoria/create" class="btn btn-primary form-control">Adicionar</a>
-    </div>
-        <div class="col-12 p-3">
-            @if (Categorias.Any())
-            {
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Nome</th>
-                        <th class="col-3">Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var categoria in Categorias)
-                    {
-                        <tr>
-                            <td>
-                                @categoria.Nome
-                            </td>
-                            <td>
-                                <NavLink href="@($"categoria/edit/{categoria.Id}")" class="btn btn-warning"><span class="oi oi-pencil" aria-hidden="true"></span> Editar</NavLink>
-                                <NavLink @onclick="()=>HandleDelete(categoria.Id, categoria.Nome)" class="btn btn-danger"><span class="ep:delete" aria-hidden="true"></span> Excluir</NavLink>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
+    <div class="col-12 p-3">
+        @if (Categorias.Any())
+        {
+            <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-1">
+                    Categorias
+            </RadzenText>
+            <RadzenText TextStyle="TextStyle.Body1" Class="my-1">
+            Detalhes das categorias
+            </RadzenText>
+            <div class="col">
+                <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle_outline" Class="mt-2 mb-4" Text="Add Categoria" Style="width:200px" Click="Create" />
+            </div>
+            <div>
+             <GridCategoria></GridCategoria>
+            </div>
+         }       
         else
         {
             if (IsLoading)
@@ -51,6 +37,10 @@
             }
         }
     </div>
+ </div>
+
+  <div class="row mt-1">
+     
  </div>
     
 @code {
@@ -80,13 +70,6 @@
         IsLoading = false;
         StateHasChanged();
     }
-    private void HandleDelete(int id, string nome)
-    {
-        DeleteCategoriaId = id;
-        NomeCategoria = nome;
-        //chama o método JS
-        _jsRuntime.InvokeVoidAsync("MostrarModalConfirmacaoDelete");
-    }
     public async Task ConfirmaDelete(bool isConfirmed)
     {
         IsLoading = true;
@@ -98,5 +81,9 @@
             await _jsRuntime.InvokeVoidAsync("OcultarModalConfirmacaoDelete");
         }
         IsLoading = false;
+    }
+    void Create()
+    {
+        _navigationManager.NavigateTo("categoria/create");
     }
 }

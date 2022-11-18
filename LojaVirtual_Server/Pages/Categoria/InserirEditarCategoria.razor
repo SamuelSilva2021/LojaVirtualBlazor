@@ -5,10 +5,6 @@
 @inject NavigationManager _navigationManager
 
 <div class="row my-2">
-    <h3 class="card-title text-primary mb-3 ml-3">@TitleWindow</h3>
-
-
-
         @if (IsLoading)
         {
             <div class="d-flex justify-content-center">
@@ -20,21 +16,31 @@
         else
         {
             <div class="col-6">
-                <EditForm Model="Categoria" OnValidSubmit="InsertEditCategoria">
-                @*Pega o data anotation da classe, nesse acaso o CategoriaDTO*@
-                <DataAnnotationsValidator/>
-                @*<ValidationSummary/>*@
-                <div class="form-group">
-                    <label>Nome</label>
-                    <InputText @bind-Value="Categoria.Nome" class="form-control"></InputText>
-                </div>
-                <ValidationMessage For="() => Categoria.Nome"/>
-                <div class="form-group p-2">
-                    <button class="@classButton"><span class="@classSpan" aria-hidden="true"></span> @TitleButton</button>
-                    <NavLink href="categoria" class="btn btn-outline-secondary"><span class="bi bi-arrow-left-square"></span> Voltar</NavLink>
-                </div>
-                </EditForm>
-            </div>
+                <RadzenTemplateForm TItem="CategoriaDTO"  Data="@Categoria" Submit="@((CategoriaDTO args) => { OnSubmit(args); })">
+                    <DataAnnotationsValidator/>
+                    <div class="container-fluid">
+                        <div class="row">
+                        <div class="col-md-12">
+                            <RadzenFieldset Text="Informações da Categoria">
+                                <div class="row">
+                                <div class="col-md-2 align-items-center d-flex">
+                                    <RadzenLabel Text="Nome" />
+                                </div>
+                                <div class="col-md-10">
+                                     <RadzenTextBox style="width: 100%;" Name="Nome" @bind-Value=@Categoria.Nome/>
+                                     <ValidationMessage For="() => Categoria.Nome"/>
+                                </div>
+                            </div>
+                            </RadzenFieldset>
+                        </div>
+                    </div>
+                        <div class="col-md-10 d-flex align-items-end justify-content-end" style="margin-top: 16px;">
+                                <RadzenButton ButtonType="ButtonType.Submit" Icon=@iconBotao Text=@textoBotao />
+                            <RadzenButton ButtonStyle="ButtonStyle.Light" Icon="cancel" style="display: inline-block; margin-left: 10px;" Text="Cancel" Click="@Cancel" />
+                        </div>
+                    </div>
+                </RadzenTemplateForm>
+            </div>           
         }
 </div>
 
@@ -45,9 +51,8 @@
 
     private CategoriaDTO Categoria { get; set; } = new CategoriaDTO();
     private string TitleWindow { get; set; } = "Adicionar Categoria";
-    private string TitleButton { get; set; } = "Inserir";
-    private string classButton { get; set; } = "btn btn-primary";
-    private string classSpan { get; set; } = "bi bi-receipt";
+    private string iconBotao = "save";
+    private string textoBotao = "Salvar";
 
     private bool IsLoading { get; set; }
 
@@ -60,12 +65,9 @@
         }
         else
         {
-            //Update
-            TitleButton = "Editar";
+            textoBotao = "Editar";
             TitleWindow = "Editar Categoria";
-            classButton = "btn btn-warning";
-            classSpan = "bi bi-pencil-fill";
-
+            iconBotao = "edit";
             await CarregaCategorias();
         }
     }
@@ -78,12 +80,17 @@
         StateHasChanged();
     }
 
-    private async Task InsertEditCategoria()
+    //Inserir categoria
+    async void OnSubmit(CategoriaDTO categoria)
     {
         if (Id == 0)
-           await _categoriaRepository.Create(Categoria);
+            await _categoriaRepository.Create(categoria);
         else
-           await _categoriaRepository.Update(Categoria);
+            await _categoriaRepository.Update(categoria);
         _navigationManager.NavigateTo("categoria");
+    }
+    void Cancel()
+    {
+        _navigationManager.NavigateTo("/categoria");
     }
 }

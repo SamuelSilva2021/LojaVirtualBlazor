@@ -1,0 +1,91 @@
+﻿@inject IProdutoRepository _produtoRepository
+@inject ICategoriaRepository _categoriaRepository
+@inject NavigationManager _navigationManager
+@inject ContextMenuService ContextMenuService
+@inject IJSRuntime _jsRuntime
+
+<DialogConfirm IsParentComponentProcessing="IsLoading" ConfirmationChanged="ConfirmaDelete" Text="@textModal" Nome="@NomeCategoria"></DialogConfirm>
+@if (IsLoading)
+{
+    <div class="d-flex justify-content-center">
+        <div class="text-center">
+            <img src="/images/loading.gif">
+        </div>
+    </div>
+}
+else
+{
+    <RadzenDataGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+        AllowPaging="true" AllowAlternatingRows="false"   PageSize="5" 
+        AllowSorting="false" Data="@categorias" TItem="CategoriaDTO" ColumnWidth="200px"  
+        SelectionMode="DataGridSelectionMode.Single" @bind-Value=@categoriaSelect >
+        <Columns>
+            <RadzenDataGridColumn TItem="CategoriaDTO" Property="Id" Title="Id" Width="30px" Frozen="true"/>
+            <RadzenDataGridColumn TItem="CategoriaDTO" Property="Nome" Title="Categoria" Frozen="true"/>
+            <RadzenDataGridColumn TItem="CategoriaDTO" Context="categoria" Filterable="false" TextAlign="TextAlign.Center" Width="70px" Title="Ações">
+                <Template Context="categoria">
+                    <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(args => EditRow(categoria))" @onclick:stopPropagation="true">
+                    </RadzenButton>
+                        <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" Class="my-1 ms-1" Click="()=>HandleDelete(categoria.Id, categoria.Nome)"  @onclick:stopPropagation="true">
+                    </RadzenButton>
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+}
+
+@code{
+    RadzenDataGrid<ProdutoDTO> Grid;
+    IList<CategoriaDTO>? lstCategoria;
+    IList<CategoriaDTO>? categoriaSelect;
+
+    private IEnumerable<CategoriaDTO> Categorias { get; set; } = new List<CategoriaDTO>();
+    IEnumerable<CategoriaDTO> categorias;
+
+    public int DeleteCategoriaId { get; set; } = 0;
+    public string NomeCategoria { get; set; }
+    private bool IsLoading { get; set; }
+    public string textModal = "Tem certeza que deseja excluir a categoria: ";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        categorias = await _categoriaRepository.GetAll();
+        Categorias = await _categoriaRepository.GetAll();
+        lstCategoria = categorias.ToList();
+    }
+
+    public async Task ConfirmaDelete(bool isConfirmed)
+    {
+        IsLoading = true;
+        if (isConfirmed && DeleteCategoriaId != 0)
+        {
+            //Delete
+            await _produtoRepository.Delete(DeleteCategoriaId);
+            await CarregCategoria();
+            await _jsRuntime.InvokeVoidAsync("OcultarModalConfirmacaoDelete");
+        }
+        IsLoading = false;
+    }
+    private async Task CarregCategoria()
+    {
+        IsLoading = true;
+        StateHasChanged();
+        categorias = await _categoriaRepository.GetAll();
+        IsLoading = false;
+        StateHasChanged();
+    }
+    async Task EditRow(CategoriaDTO categoria)
+    {
+        _navigationManager.NavigateTo($"categoria/edit/{categoria.Id}");
+        StateHasChanged();
+    }
+    private void HandleDelete(int id, string nome)
+    {
+        DeleteCategoriaId = id;
+        NomeCategoria = nome;
+        //chama o método JS
+        _jsRuntime.InvokeVoidAsync("MostrarModalConfirmacaoDelete");
+    }
+}
