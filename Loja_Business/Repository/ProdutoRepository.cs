@@ -64,11 +64,11 @@ namespace Loja_Business.Repository
                 objFromDb.ImageUrl = objDTO.ImageUrl;
                 objFromDb.CategoriaId= objDTO.CategoriaId;
                 objFromDb.Cor = objDTO.Cor;
-                objFromDb.Observacao= objDTO.Observacao;
                 objFromDb.DataCriacao= objDTO.DataCriacao;
                 objFromDb.DataAlteracao= objDTO.DataAlteracao;
                 objFromDb.ValorCompra = objDTO.ValorCompra;
                 objFromDb.PrecoVenda= objDTO.PrecoVenda;
+                objFromDb.Observacao= objDTO.Observacao;
 
                 _db.Produtos.Update(objFromDb);
                 await _db.SaveChangesAsync();

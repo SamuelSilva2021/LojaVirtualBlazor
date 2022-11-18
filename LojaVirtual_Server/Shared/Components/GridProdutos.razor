@@ -4,6 +4,10 @@
 @inject ICategoriaRepository _categoriaRepository
 @inject NavigationManager _navigationManager
 @inject ContextMenuService ContextMenuService
+@inject IJSRuntime _jsRuntime
+
+<_DeleteConfirmation IsParentComponentProcessing="IsLoading" ConfirmationChanged="ConfirmaDelete" Text="@textModal" Nome="@NomeProduto"></_DeleteConfirmation>
+
 @if (IsLoading)
 {
                 <div class="d-flex justify-content-center">
@@ -31,7 +35,7 @@
                     <Template Context="produto">
                         <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(args => EditRow(produto))" @onclick:stopPropagation="true">
                         </RadzenButton>
-                        <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" Class="my-1 ms-1" Click="@(args => DeleteRow(produto))"  @onclick:stopPropagation="true">
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" Class="my-1 ms-1" Click="()=>HandleDelete(produto.Id, produto.Nome)"  @onclick:stopPropagation="true">
                         </RadzenButton>
                     </Template>
                 </RadzenDataGridColumn>
@@ -46,7 +50,11 @@
     IList<ProdutoDTO>? produtoSelecionado;
     IEnumerable<ProdutoDTO>? produtos;
     private IEnumerable<CategoriaDTO> Categorias { get; set; } = new List<CategoriaDTO>();
+
+    public int DeleteProdutoId { get; set; } = 0;
+    public string NomeProduto { get; set; }
     private bool IsLoading { get; set; }
+    public string textModal = "Tem certeza que deseja excluir o produto: ";
 
     protected override async Task OnInitializedAsync()
     {
@@ -97,5 +105,32 @@
                 Console.WriteLine($"Menu item with Value={e.Value} clicked. Column: {args.Column.Property}, EmployeeID: {args.Data.Id}");
             }
          );
+    }
+    private void HandleDelete(int id, string nome)
+    {
+        DeleteProdutoId = id;
+        NomeProduto = nome;
+        //chama o método JS
+        _jsRuntime.InvokeVoidAsync("MostrarModalConfirmacaoDelete");
+    }
+    public async Task ConfirmaDelete(bool isConfirmed)
+    {
+        IsLoading = true;
+        if (isConfirmed && DeleteProdutoId != 0)
+        {
+            //Delete
+            await _produtoRepository.Delete(DeleteProdutoId);
+            await ListarProdutos();
+            await _jsRuntime.InvokeVoidAsync("OcultarModalConfirmacaoDelete");
+        }
+        IsLoading = false;
+    }
+    private async Task ListarProdutos()
+    {
+        IsLoading = true;
+        StateHasChanged();
+        produtos = await _produtoRepository.GetAll();
+        IsLoading = false;
+        StateHasChanged();
     }
 }

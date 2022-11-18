@@ -19,11 +19,11 @@ namespace Loja_DataAccess
         public int CategoriaId { get; set; }
         [ForeignKey("CategoriaId")]
         public Categoria Categoria { get; set;}
-        public string? Observacao { get; set; }
         public DateTime DataCriacao { get; set; }
         public DateTime DataAlteracao { get; set; }
         public double ValorCompra { get; set; }
         public double PrecoVenda { get; set; }
+        public string? Observacao { get; set; }
 
     }
 }

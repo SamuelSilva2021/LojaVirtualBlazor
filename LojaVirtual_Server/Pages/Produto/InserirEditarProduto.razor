@@ -1,6 +1,6 @@
 ﻿@*@page "/produto/create"
-@page "/produto/edit/{id:int}"*@
-
+@page "/produto/edit/{id:int}"
+*@
 @inject ICategoriaRepository _categoriaRepository
 @inject IProdutoRepository _produtoRepository
 @inject NavigationManager _navigationManager
@@ -84,13 +84,6 @@
     private string classSpan { get; set; } = "bi bi-receipt";
     private bool IsLoading { get; set; }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await ListarProdutos();
-        }
-    }
     private async Task ListarProdutos()
     {
         IsLoading = true;

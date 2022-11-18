@@ -4,7 +4,6 @@
 @inject IFileUpLoad _fileUpload
 @inject NavigationManager _navigationManager
 
-<_DeleteConfirmation IsParentComponentProcessing="IsLoading" ConfirmationChanged="ConfirmaDelete" Text="@textModal" Nome="@NomeProduto"></_DeleteConfirmation>
 
  <div class="row mt-1">
      <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-1">
@@ -27,9 +26,6 @@
 
     private IEnumerable<ProdutoDTO> Produtos { get; set; } = new List<ProdutoDTO>();
     private bool IsLoading { get; set; }
-    public int DeleteProdutoId { get; set; } = 0;
-    public string NomeProduto { get; set; }
-    public string textModal = "Tem certeza que deseja excluir o produto: ";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -47,25 +43,7 @@
         IsLoading = false;
         StateHasChanged();
     }
-    private void HandleDelete(int id, string nome)
-    {
-        DeleteProdutoId = id;
-        NomeProduto = nome;
-        //chama o método JS
-        _jsRuntime.InvokeVoidAsync("MostrarModalConfirmacaoDelete");
-    }
-    public async Task ConfirmaDelete(bool isConfirmed)
-    {
-        IsLoading = true;
-        if (isConfirmed && DeleteProdutoId != 0)
-        {
-            //Delete
-            await _produtoRepository.Delete(DeleteProdutoId);
-            await ListarProdutos();
-            await _jsRuntime.InvokeVoidAsync("OcultarModalConfirmacaoDelete");
-        }
-        IsLoading = false;
-    }
+    
     void NavFormCadProdutos()
     {
         _navigationManager.NavigateTo("produto/create");

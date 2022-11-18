@@ -13,15 +13,23 @@
             {
                 //se estiver no loading...
                 <div class="modal-footer">
-                    <button type="button" disabled class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    <button type="button" disabled class="btn btn-danger" data-dismiss="modal">Processando...</button>
+                        <button type="button" disabled class="rz-button rz-button-md rz-variant-filled rz-primary rz-shade-default" id="rRFLR-aeWU">Cancelar</button>
+                        <button type="button" disabled class="rz-button rz-button-md rz-variant-filled rz-secondary rz-shade-default" id="2uEbr9J01U">Processando...</button>
                 </div>
             }
             else
             {
                 <div class="modal-footer">
-                    <button type="button" @onclick="()=>OnConfirmationDelete(false)" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    <button type="button" @onclick="()=>OnConfirmationDelete(true)" class="btn btn-danger" data-dismiss="modal">Delete</button>
+                    <button type="button" @onclick="()=>OnConfirmationDelete(false)" class="rz-button rz-button-md rz-variant-filled rz-primary rz-shade-default" id="rRFLR-aeWU">
+                       <span class="rz-button-box">
+                           <span class="rz-button-text">Cancelar</span>
+                       </span>
+                    </button>
+                    <button type="button" @onclick="()=>OnConfirmationDelete(true)" class="rz-button rz-button-md rz-variant-filled rz-secondary rz-shade-default" id="2uEbr9J01U">
+                       <span class="rz-button-box">
+                           <span class="rz-button-text">Deletar</span>
+                       </span>
+                    </button>
                 </div>
             }            
         </div>

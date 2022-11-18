@@ -1,5 +1,6 @@
 ﻿@page "/produto/create"
 @page "/produto/edit/{id:int}"
+
 @inject ICategoriaRepository _categoriaRepository
 @inject IProdutoRepository _produtoRepository
 @inject NavigationManager _navigationManager
@@ -27,6 +28,7 @@
     else
     {
            <RadzenTemplateForm TItem="ProdutoDTO"  Data="@produto" Submit="@((ProdutoDTO args) => { OnSubmit(args); })">
+            <DataAnnotationsValidator/>
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-6">
@@ -66,13 +68,22 @@
                                     </div>
                                     
                                 </div>
-                            <div class="row">
+                                <div class="row">
                                     <div class="col-md-2 align-items-center d-flex">
-                                            <RadzenLabel Text="Imagem" />
-                                        </div>
-                                         <div class="col-md-10">
-                                         <InputFile OnChange="HandleImageUpload" class="form-control"></InputFile>                                       
-                                        </div>
+                                            <RadzenLabel Text="Observação" />
+                                    </div>
+                                    <div class="col-md-10">
+                                            <RadzenTextArea style="width: 100%;" Name="Observacao" @bind-Value=@produto.Observacao/>
+                                            <ValidationMessage For="() => produto.Cor"/>
+                                    </div>
+                                </div>
+                            <div class="row">
+                                <div class="col-md-2 align-items-center d-flex">
+                                    <RadzenLabel Text="Imagem" />
+                                </div>
+                                 <div class="col-md-10">
+                                 <InputFile OnChange="HandleImageUpload" class="form-control"></InputFile>                                       
+                                </div>
                             </div>
                             <div class="row">
                                 <div class="align-items-center d-flex col-md-2">
@@ -122,8 +133,8 @@
     private ProdutoDTO produto { get; set; } = new()
     {
         ImageUrl = "/images/default.png",
-            ValorCompra = 0.0,
-            PrecoVenda = 0.0
+        ValorCompra = 0.0,
+        PrecoVenda = 0.0
     };
     private IEnumerable<CategoriaDTO> Categorias { get; set; } = new List<CategoriaDTO>();
     private IEnumerable<ProdutoDTO> Produtos { get; set; } = new List<ProdutoDTO>();
