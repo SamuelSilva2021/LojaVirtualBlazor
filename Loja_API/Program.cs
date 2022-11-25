@@ -17,6 +17,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
 
+//Configura CORS
+builder.Services.AddCors(o => o.AddPolicy("Loja", builder =>
+{
+    builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+}));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -27,7 +33,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+//Usa Cors
+app.UseCors("Loja");
 app.UseRouting();
 
 app.UseAuthorization();

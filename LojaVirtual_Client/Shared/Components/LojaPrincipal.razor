@@ -1,0 +1,77 @@
+﻿@using LojaVirtual_Client.Service.IService;
+@using Loja_Models;
+@inject IProdutoService _productService
+@inject NavigationManager _navigation
+
+    @if (IsProcessing)
+    {
+            <div style="position:fixed;top:50%;left:50%;margin-top:-50px;margin-left:-100px;">
+                <img src="images/ajax-loader.gif" />
+            </div>
+    }
+    else
+    {
+        <div class="containerApp">
+            <div class="row  pb-3 pt-3 backgroundWhite">
+                @foreach (var categoria in Produtos.Select(u => u.Categoria.Nome).Distinct())
+                {
+                        <h2 class="text-success pl-1 tituloCategoria"><b>@categoria</b></h2>
+                    @foreach (var produto in Produtos.Where(u => u.Categoria.Nome == categoria))
+                    {
+                        <div class="cartao">
+                            <div class="imgBx">
+                                        <img src="@produto.ImageUrl"/>
+                                        <ul class="action">
+                                            <li>
+                                                <i class="fa fa-heart"></i>
+                                                <span>Favorito</span>
+                                            </li>
+                                            <li>
+                                                <i class="fa fa-shopping-cart"></i>
+                                                <span>Carrinho</span>
+                                            </li>
+                                            <li>
+                                               <a href="/detalhes/@produto.Id"><i class="fa fa-eye"></i></a> 
+                                                <span>Detalhes</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="content">
+                                        <div class="produtoNome">
+                                            <h3>@produto.Nome</h3>
+                                        </div>
+                                        <div class="price_rating">
+                                            <h2>@produto.PrecoVenda.ToString("C")</h2>
+                                            <div class="rating">
+                                                <i class=" fa fa-star" aria-hidden="true"></i>
+                                                <i class=" fa fa-star" aria-hidden="true"></i>
+                                                <i class=" fa fa-star" aria-hidden="true"></i>
+                                                <i class=" fa fa-star" aria-hidden="true"></i>
+                                                <i class=" fa fa-star grey" aria-hidden="true"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                    }
+                }
+            </div>
+        </div>
+    }
+
+@code {
+    public bool IsProcessing { get; set; } = false;
+    public IEnumerable<ProdutoDTO> Produtos { get; set; } = new List<ProdutoDTO>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsProcessing = true;
+        Produtos = await _productService.GetAll();
+        IsProcessing = false;
+    }
+    public void OpenDetails()
+    {
+        _navigation.NavigateTo("/detalhes");
+    }
+}

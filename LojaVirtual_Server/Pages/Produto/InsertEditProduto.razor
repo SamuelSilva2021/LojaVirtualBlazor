@@ -90,13 +90,13 @@
                                     <RadzenLabel Text="Inclusão" />
                                 </div>
                                 <div class="col-md-4">
-                                    <RadzenDatePicker style="width: 100%;" Name="DtIncl" @bind-Value="dadosProduto.DtIncl" Disabled="true" />
+                                    <RadzenDatePicker style="width: 100%;" Name="DtIncl" @bind-Value="produto.DataCriacao" Disabled="true" />
                                 </div>
                                 <div class="align-items-center d-flex col-md-2">
                                     <RadzenLabel Text="Alteração" />
                                 </div>
                                 <div class="col-md-4">
-                                    <RadzenDatePicker style="width: 100%;" Name="DtAlter" @bind-Value="dadosProduto.DtAlter" Disabled="true" />
+                                    <RadzenDatePicker style="width: 100%;" Name="DtAlter" @bind-Value="produto.DataAlteracao" Disabled="true" />
                                 </div>
                             </div>
                             <div class="row">
@@ -134,7 +134,8 @@
     {
         ImageUrl = "/images/default.png",
         ValorCompra = 0.0,
-        PrecoVenda = 0.0
+        PrecoVenda = 0.0,
+        DataCriacao = DateTime.Now
     };
     private IEnumerable<CategoriaDTO> Categorias { get; set; } = new List<CategoriaDTO>();
     private IEnumerable<ProdutoDTO> Produtos { get; set; } = new List<ProdutoDTO>();
@@ -151,12 +152,6 @@
     //Variáveis responsáveis pela interação de componentes
     string iconeBotao = "save";
     string textoBotao = "Salvar";
-
-    public class DadosProduto
-    {
-        public DateTime DtIncl { get; set; }
-        public DateTime DtAlter { get; set; }
-    }
 
     protected async override Task OnInitializedAsync()
     {
@@ -178,12 +173,6 @@
         IsLoading = false;
         StateHasChanged();
     }
-
-    DadosProduto dadosProduto = new DadosProduto()
-        {
-            DtIncl = DateTime.Now,
-            DtAlter = DateTime.Now
-        };
 
     void CompleteUpload(UploadCompleteEventArgs args)
     {
@@ -243,9 +232,14 @@
     async void OnSubmit(ProdutoDTO produto)
     {
         if (produto.Id == 0)
-           await _produtoRepository.Create(produto);
+        {
+            await _produtoRepository.Create(produto);
+        }        
         else
-           await _produtoRepository.Update(produto);
+        {
+            produto.DataAlteracao = DateTime.Now;
+            await _produtoRepository.Update(produto);
+        }
         _navigationManager.NavigateTo("produto");
     }
     void OnChange(object value)

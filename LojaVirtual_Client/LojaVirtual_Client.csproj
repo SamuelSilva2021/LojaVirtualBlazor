@@ -14,4 +14,8 @@
     <PackageReference Include="Syncfusion.Blazor.Themes" Version="20.3.0.57" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Loja_Models\Loja_Models.csproj" />
+  </ItemGroup>
+
 </Project>

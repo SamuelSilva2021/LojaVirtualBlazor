@@ -1,9 +1,15 @@
 ﻿@page "/"
+@using LojaVirtual_Client.Service.IService;
+@using Loja_Models;
+@inject IProdutoService _productService;
+@using LojaVirtual_Client.Shared.Components;
 
-<PageTitle>Index</PageTitle>
+<body>
+    <div>
 
-<h1>Hello, world!</h1>
+    </div>
+    <div>
+        <LojaPrincipal></LojaPrincipal>
+    </div>
+</body>
 
-Welcome to your new app.
-
-<SurveyPrompt Title="How is Blazor working for you?" />

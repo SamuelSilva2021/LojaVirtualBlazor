@@ -1,4 +1,6 @@
 using LojaVirtual_Client;
+using LojaVirtual_Client.Service;
+using LojaVirtual_Client.Service.IService;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Syncfusion.Blazor;
@@ -9,7 +11,8 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.Configuration.GetValue<string>("BaseAPIUrl")) });
+builder.Services.AddScoped<IProdutoService, ProdutoService>();
 builder.Services.AddSyncfusionBlazor();
+
 await builder.Build().RunAsync();
